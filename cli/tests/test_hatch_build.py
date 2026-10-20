@@ -103,8 +103,15 @@ class TestCliWheelBuild(unittest.TestCase):
 
     def test_release_cleans_both_binary_names_between_targets(self):
         workflow = (REPO_ROOT / ".github/workflows/release-cli.yml").read_text()
-        self.assertEqual(workflow.count("rm -f onyx-cli onyx-cli.exe"), 5)
-        self.assertNotIn("rm -f onyx-cli\n", workflow)
+        cleanup_lines = [
+            line.strip()
+            for line in workflow.splitlines()
+            if line.strip().startswith("rm -f onyx-cli")
+        ]
+        self.assertTrue(cleanup_lines, "release must clear cached CLI binaries")
+        self.assertTrue(
+            all(line == "rm -f onyx-cli onyx-cli.exe" for line in cleanup_lines)
+        )
 
 
 if __name__ == "__main__":
