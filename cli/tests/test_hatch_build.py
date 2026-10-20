@@ -69,7 +69,10 @@ class TestCliWheelBuild(unittest.TestCase):
             hook.initialize("1.4.4", build_data)
 
         self.assertFalse(build_data["pure_python"])
-        self.assertEqual(build_data["tag"], f"py3-none-{goos}-amd64" if goos else build_data.get("tag"))
+        if goos:
+            self.assertEqual(build_data["tag"], f"py3-none-{goos}-amd64")
+        else:
+            self.assertNotIn("tag", build_data)
         self.assertEqual(exists.call_count, 1)
         return build_data["shared_scripts"], exists.call_args.args[0], build
 
@@ -97,7 +100,7 @@ class TestCliWheelBuild(unittest.TestCase):
     def test_release_cleans_both_binary_names_between_targets(self):
         workflow = (REPO_ROOT / ".github/workflows/release-cli.yml").read_text()
         self.assertEqual(workflow.count("rm -f onyx-cli onyx-cli.exe"), 5)
-        self.assertNotIn("rm -f onyx-cli\\n", workflow)
+        self.assertNotIn("rm -f onyx-cli\n", workflow)
 
 
 if __name__ == "__main__":
