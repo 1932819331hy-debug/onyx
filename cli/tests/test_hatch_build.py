@@ -37,7 +37,9 @@ def load_build_hook():
     interface.BuildHookInterface = type("BuildHookInterface", (), {})
     stubs[interface.__name__] = interface
 
-    spec = importlib.util.spec_from_file_location("onyx_hatch_build_test", CLI_DIR / "hatch_build.py")
+    spec = importlib.util.spec_from_file_location(
+        "onyx_hatch_build_test", CLI_DIR / "hatch_build.py"
+    )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     with mock.patch.dict(sys.modules, stubs):
@@ -63,7 +65,9 @@ class TestCliWheelBuild(unittest.TestCase):
         with (
             mock.patch.dict(os.environ, env, clear=True),
             mock.patch.object(module.os, "name", host_os),
-            mock.patch.object(module.os.path, "exists", return_value=binary_exists) as exists,
+            mock.patch.object(
+                module.os.path, "exists", return_value=binary_exists
+            ) as exists,
             mock.patch.object(module.subprocess, "check_call") as build,
         ):
             hook.initialize("1.4.4", build_data)
